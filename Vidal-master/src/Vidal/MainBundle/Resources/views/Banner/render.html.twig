@@ -1,0 +1,81 @@
+{% set isProd = app.environment == 'prod' %}
+{% set isLogged = app.user ? true : false %}
+{% set isMobile = is_mobile() %}
+{% set mustShow = mustShow is defined and mustShow %}
+
+{% for banner in banners %}
+	{% set group = 'banner_' ~ banner.id %}
+	{% set name = 'banner-' ~ banner.group.name %}
+
+	{% set width = (banner.width != null ? banner.width : banner.group.width ) %}
+	{% set height = (banner.height != null ? banner.height : banner.group.height ) %}
+
+	{% if is_mobile() %}
+		{% if banner.mobileWidth is not empty %}
+			{% set width = banner.mobileWidth %}
+		{% endif %}
+		{% if banner.mobileHeight is not empty %}
+			{% set height = banner.mobileHeight %}
+		{% endif %}
+	{% endif %}
+
+	{% if mustShow or not banner.testMode or request.get('t') == 't' %}
+		{% if mustShow or banner.notForPage is empty or (pathInfo not in banner.notForPage|explodeList and (routeName != 'publication' or '/novosti/*' not in banner.notForPage|explodeList)) %}
+			{% if mustShow or banner.displayTo is empty or (banner.displayTo == 'logged' and isLogged) or (banner.displayTo == 'guest' and not isLogged) %}
+				{% if mustShow or not banner.indexPage or (indexPage is defined and indexPage) %}
+					{% if mustShow or isMobile == false or productPage == false or banner.mobileProduct == false %}
+						{% if mustShow or banner.forPage is empty or pathInfo in banner.forPage|explodeList
+						or (routeName == 'publication' and '/novosti/*' in banner.forPage|explodeList) %}
+							<div id="{{ group }}" class="banner {{ name }}"
+								 style="width:{{ width }}px; height:{{ height }}px; {{ style is defined ? style : '' }}">
+								<a href="{{ banner.loggedLink is not empty and app.user ? banner.loggedLink : banner.link }}"
+								   class="banner-link"
+								   target="_blank"
+								   {{ nofollow is defined and nofollow ? 'rel="nofollow"' : '' }}
+								   style="width:{{ width }}px; height:{{ height }}px">
+									<img
+										src="{{ isMobile and banner.mobileBanner is not empty ? banner.mobileBanner.path : banner.banner.path }}"
+										alt="{{ banner.alt }}"
+										style="width:{{ width }}px; height:{{ height }}px"/>
+								</a>
+
+								{# админам карандашик редактирования #}
+								{% if app.user is not null and is_granted('ROLE_ADMIN') %}
+									<a class="admin-edit fade" target="_blank"
+									   href="{{ path('admin_vidal_main_banner_edit', {'id':banner.id}) }}">
+										<img src="{{ asset('bundles/vidalmain/images/edit.png') }}"/>
+									</a>
+								{% endif %}
+							</div>
+
+							<script type="text/javascript">
+								$(document).ready(function() {
+									{% if isProd %}
+									ga('send', 'event', 'Показ баннера: {{ banner.title }}', 'show', '{{ banner.link }}');
+									{% if banner.showEvent is not empty %}
+									ga('send', 'event', '{{ banner.showEvent }}', 'click', '{{ banner.link }}');
+									{% endif %}
+									{% endif %}
+
+									$('#{{ group }} .banner-link').click(function() {
+										{% if isProd %}
+										ga('send', 'event', 'Клик баннера: {{ banner.title }}', 'click', '{{ banner.link }}');
+										{% if banner.clickEvent is not empty %}
+										ga('send', 'event', '{{ banner.clickEvent }}', 'click', '{{ banner.link }}');
+										{% endif %}
+										{% endif %}
+										$.get(Routing.generate('banner_clicked', {'bannerId': '{{ banner.id }}'}));
+									});
+								});
+							</script>
+						{% endif %}
+					{% endif %}
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	{% endif %}
+
+	{% if vetPage is defined and vetPage and banner.id == 40 %}
+		{% include 'VidalVeterinarBundle::right_banners.html.twig' %}
+	{% endif %}
+{% endfor %}

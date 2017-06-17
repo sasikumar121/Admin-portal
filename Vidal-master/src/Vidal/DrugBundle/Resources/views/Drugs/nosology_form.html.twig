@@ -1,0 +1,69 @@
+<form id="form" method="GET" action="{{ path('nosology') }}">
+
+	<div id="form_controls">
+		<input id="form_submit" type="submit" value="Найти" class="btn-red">
+		<input id="form_input" type="text" name="q" placeholder="Введите слово для поиска..."
+			   value="{{ q is defined and q is not empty and not l ? q }}"/>
+	</div>
+
+	<div class="letters">
+		<div>
+			<input type="submit" value="A00-B99" name="l" {{ l == 'A00-B99' ? ' class="active"' }}/>
+			<input type="submit" value="C00-D48" name="l" {{ l == 'C00-D48' ? ' class="active"' }}/>
+			<input type="submit" value="D50-D89" name="l" {{ l == 'D50-D89' ? ' class="active"' }}/>
+			<input type="submit" value="E00-E90" name="l" {{ l == 'E00-E90' ? ' class="active"' }}/>
+			<input type="submit" value="F00-F99" name="l" {{ l == 'F00-F99' ? ' class="active"' }}/>
+			<input type="submit" value="G00-G99" name="l" {{ l == 'G00-G99' ? ' class="active"' }}/>
+			<input type="submit" value="H00-H59" name="l" {{ l == 'H00-H59' ? ' class="active"' }}/>
+			<input type="submit" value="H60-H95" name="l" {{ l == 'H60-H95' ? ' class="active"' }}/>
+			<input type="submit" value="I00-I99" name="l" {{ l == 'I00-I99' ? ' class="active"' }}/>
+			<input type="submit" value="J00-J99" name="l" {{ l == 'J00-J99' ? ' class="active"' }}/>
+			<input type="submit" value="K00-K93" name="l" {{ l == 'K00-K93' ? ' class="active"' }}/>
+			<input type="submit" value="L00-L99" name="l" {{ l == 'L00-L99' ? ' class="active"' }}/>
+			<input type="submit" value="M00-M99" name="l" {{ l == 'M00-M99' ? ' class="active"' }}/>
+			<input type="submit" value="N00-N99" name="l" {{ l == 'N00-N99' ? ' class="active"' }}/>
+			<input type="submit" value="O00-O99" name="l" {{ l == 'O00-O99' ? ' class="active"' }}/>
+			<input type="submit" value="P00-P96" name="l" {{ l == 'P00-P96' ? ' class="active"' }}/>
+			<input type="submit" value="Q00-Q99" name="l" {{ l == 'Q00-Q99' ? ' class="active"' }}/>
+			<input type="submit" value="R00-R99" name="l" {{ l == 'R00-R99' ? ' class="active"' }}/>
+			<input type="submit" value="S00-T98" name="l" {{ l == 'S00-T98' ? ' class="active"' }}/>
+			<input type="submit" value="Z00-Z99" name="l" {{ l == 'Z00-Z99' ? ' class="active"' }}/>
+		</div>
+	</div>
+</form>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#form_input')
+			.autocomplete({
+				minLength: 2,
+				source:    function(request, response) {
+					var url = Routing.generate('elastic_autocomplete_nozology', {'term': request.term.trim()});
+					$.getJSON(url, function(data) {
+						response($.map(data.hits.hits, function(item) {
+							return {
+								label: item.highlight.name,
+								value: item._source.name,
+								code:  item._source.code
+							}
+						}));
+					});
+				},
+				select:    function(event, ui) {
+					if (ui.item) {
+						$(this).val(ui.item.value);
+					}
+				}
+			})
+			.data("ui-autocomplete")._renderItem = function(ul, item) {
+			return $('<li class="aut"></li>')
+				.data("item.autocomplete", item)
+				.append("<a>" + item.label + "</a>")
+				.appendTo(ul);
+		};
+
+		$('.letters input').click(function() {
+			$('#form_input').attr('disabled', 'disabled');
+		});
+	});
+</script>

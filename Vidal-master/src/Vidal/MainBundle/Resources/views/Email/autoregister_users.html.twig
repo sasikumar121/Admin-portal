@@ -1,0 +1,42 @@
+{% extends 'VidalMainBundle:Email:template.html.twig' %}
+
+{% block content %}
+	<p>Здравствуйте, уважаемый коллега!</p>
+
+	<p>Вы получили это письмо, потому что заполнили анкету VIDAL и согласились зарегистрироваться на нашем портале.
+	</p>
+
+	<p>Мы зарегистрировали Вас на нашем сайте
+		<a href="https://www.vidal.ru" target="_blank">www.vidal.ru</a>
+		и создали для Вас аккаунт!</p>
+
+	<p>Ваш логин: {{ user.username }}<br/>
+	Ваш пароль: {{ user.password }}<br/>
+	Ваш профиль: <a href="https://www.vidal.ru/profile" target="_blank">www.vidal.ru/profile</a>
+		(доступен после авторизации).</p>
+
+	<p>Пожалуйста, заполните недостающие данные в Вашем профиле и подтвердите Ваш e-mail адрес,
+		перейдя по ссылке:<br/>
+		<a href="https://www.vidal.ru/confirm-email/{{ user.id }}/{{ user.hash }}">
+			https://www.vidal.ru/confirm-email/{{ user.id }}/{{ user.hash }}
+		</a>
+	</p>
+
+	<div>Благодаря регистрации на нашем портале Вы теперь:
+		<ul>
+			<li>Можете воспользоваться нашими
+				<a href="https://www.vidal.ru/services" target="_blank">
+					мобильными приложениями
+				</a>
+			</li>
+			<li>Можете ознакомиться с материалами для специалистов и бесплатно скачивать электронные справочники VIDAL
+				<a href="https://www.vidal.ru/vracham/vidal-cd" target="_blank">в специализированном разделе</a></li>
+		</ul>
+	</div>
+
+	<p>Оставайтесь с нами!</p>
+
+	<img src="https://www.vidal.ru/digest_q/opened/{{deliveryId}}/{{ user.id }}"/>
+	<img
+		src="http://www.google-analytics.com/collect?v=1&tid=UA-45285788-1&cid={{ user.id }}&t=event&ec={{ deliveryId }}&ea=open&el=recipient_id&cs=newsletter&cm=email&cn={{ deliveryId }}"/>
+{% endblock %}

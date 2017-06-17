@@ -1,0 +1,44 @@
+<a href="http://www.vetoquinol.ru/" class="banner-link banner-vetoquinol"
+   style="width:200px; height:200px; display: block; margin: 0 auto 25px; border: 1px solid #ccc;">
+	<div id="animation_container" style="background-color:rgba(255, 255, 255, 1.00); width:200px; height:200px">
+		<canvas id="canvas" width="200" height="200"
+				style="position: absolute; display: block; background-color:rgba(255, 255, 255, 1.00);"></canvas>
+		<div id="dom_overlay_container"
+			 style="pointer-events:none; overflow:hidden; width:200px; height:200px; position: absolute; left: 0px; top: 0px; display: block;">
+		</div>
+	</div>
+</a>
+
+<a href="http://vetoquinol.ru/content/cimalgex%C2%AE" class="banner-link banner-vetoquinol"
+   style="width:200px; height:200px; display: block; margin: 0 auto 25px; border: 1px solid #ccc;">
+	<div id="animation_container2" style="background-color:rgba(255, 255, 255, 1.00); width:200px; height:200px">
+		<canvas id="canvas2" width="200" height="200"
+				style="position: absolute; display: block; background-color:rgba(255, 255, 255, 1.00);"></canvas>
+		<div id="dom_overlay_container2"
+			 style="pointer-events:none; overflow:hidden; width:200px; height:200px; position: absolute; left: 0px; top: 0px; display: block;">
+		</div>
+	</div>
+</a>
+
+<a href="http://www.vetoquinol.ru/content/buy" class="banner-link banner-vetoquinol"
+   style="width:200px; height:200px; display: block; margin: 0 auto 25px;">
+	<div id="animation_container3" style="background-color:rgba(255, 255, 255, 1.00); width:200px; height:200px">
+		<canvas id="canvas3" width="200" height="200"
+				style="position: absolute; display: block; background-color:rgba(255, 255, 255, 1.00);"></canvas>
+		<div id="dom_overlay_container3"
+			 style="pointer-events:none; overflow:hidden; width:200px; height:200px; position: absolute; left: 0px; top: 0px; display: block;">
+		</div>
+	</div>
+</a>
+
+{% if app.environment == 'prod' %}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			ga('send', 'event', 'Показ баннеров: vetoquinol', 'show', 'http://www.vetoquinol.ru/');
+
+			$('.banner-vetoquinol').click(function() {
+				ga('send', 'event', 'Клик баннера: vetoquinol', 'click', $(this).attr('href'));
+			});
+		});
+	</script>
+{% endif %}

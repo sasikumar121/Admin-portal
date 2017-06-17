@@ -1,0 +1,69 @@
+{% if riglaPrice is defined and riglaPrice is not empty %}
+	<style>
+		.buy-table {
+			width:           100%;
+			border-collapse: collapse;
+			font-size:       13px;
+		}
+		.buy-table td {
+			border:     1px solid #cfcfcf;
+			padding:    7px 10px;
+			text-align: center;
+			width:      60px;
+		}
+		.buy-table td.buy-name {
+			width:      auto;
+			text-align: left;
+		}
+		.buy-header {
+			color:     #d71344;
+			font-size: 1.3em;
+			margin:    25px 0 10px;
+		}
+		.rigla-mobile {
+			display: none;
+			margin: -2px 0 12px;
+		}
+	</style>
+
+	<script>
+		$(document).ready(function() {
+			if ((navigator.userAgent.match(/Android/i)
+				|| navigator.userAgent.match(/webOS/i)
+				|| navigator.userAgent.match(/iPhone/i)
+				|| navigator.userAgent.match(/iPad/i)
+				|| navigator.userAgent.match(/iPod/i)
+				|| navigator.userAgent.match(/BlackBerry/i)
+				|| navigator.userAgent.match(/Windows Phone/i))
+				&& window.screen.width < 768
+			) {
+				$('.rigla-logo').hide();
+				$('.rigla-mobile').css('display', 'block').show();
+			}
+		});
+	</script>
+
+	<noindex>
+		<div id="buy-box">
+			<h2 class="buy-header">Купить в аптеке</h2>
+			<div class="rigla-mobile">
+				<img src="{{ asset('bundles/vidalmain/images/apteka/rigla.png') }}" style="max-height:50px;"/>
+			</div>
+			<table class="buy-table">
+				{% for price in riglaPrice %}
+				<tr>
+					<td class="buy-name">{{ price.rigla.title|raw }}</td>
+					<td>{{ price.price }} руб.</td>
+					<td class="rigla-logo">
+						<img src="{{ asset('bundles/vidalmain/images/apteka/rigla.png') }}" style="max-height:38px;"/>
+					</td>
+					<td>
+						<a rel="nofollow" href="http://www.rigla.ru/shop/item/{{ price.rigla.code }}" target="_blank"
+						   class="btn-red">Купить</a>
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</noindex>
+{% endif %}

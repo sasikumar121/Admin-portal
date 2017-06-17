@@ -1,0 +1,15 @@
+{# Объявление, описание чего пойдет ниже #}
+<div class="anons relative">
+	<div class="anons-head">
+		{% if isMI is defined and isMI %}
+			<span>Описание медицинского изделия</span>
+		{% else %}
+			<span>Описание биологически активной добавки</span>
+		{% endif %}
+		<span class="anons-product">{{ document.RusName|raw }}</span>
+		<span>({{ document.EngName|raw }})</span>
+	</div>
+	<div class="anons-content">
+		Основано на официально утвержденных материалах и сделано в {{ document.YearEdition }} году.
+	</div>
+</div>

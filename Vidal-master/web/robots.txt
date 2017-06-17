@@ -1,0 +1,38 @@
+User-agent: Yandex
+Disallow: /app_dev.php
+Disallow: /addbsk
+Disallow: /api
+Disallow: /players
+Disallow: /psw
+Disallow: /m/
+Disallow: /univadis/
+Host: https://www.vidal.ru/
+
+User-agent: Googlebot
+Disallow: /app_dev.php
+Disallow: /addbsk
+Disallow: /api
+Disallow: /players
+Disallow: /psw
+Disallow: /m/
+Disallow: /univadis/
+
+User-agent: Slurp
+Disallow: /app_dev.php
+Disallow: /addbsk
+Disallow: /api
+Disallow: /players
+Disallow: /psw
+Disallow: /m/
+Disallow: /univadis/
+Crawl-delay: 0.1
+
+User-agent: *
+Disallow: /app_dev.php
+Disallow: /addbsk
+Disallow: /api
+Disallow: /players
+Disallow: /psw
+Disallow: /m/
+Disallow: /univadis/
+Sitemap: https://www.vidal.ru/sitemap.xml

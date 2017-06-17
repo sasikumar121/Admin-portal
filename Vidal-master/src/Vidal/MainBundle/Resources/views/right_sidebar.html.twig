@@ -1,0 +1,7 @@
+{% if env_local != true %}
+	{% if isMobile %}
+		{{ render(controller('VidalMainBundle:Banner:renderMobile', {'request':app.request, 'indexPage':indexPage, 'productPage':productPage})) }}
+	{% else %}
+		{{ render(controller('VidalMainBundle:Banner:render', {'request':app.request, 'groupId':10, 'indexPage':indexPage})) }}
+	{% endif %}
+{% endif %}

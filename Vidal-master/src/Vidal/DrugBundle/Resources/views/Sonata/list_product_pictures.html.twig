@@ -1,0 +1,44 @@
+<script type="text/javascript">
+	$(document).ready(function() {
+		var pictures = $('.RusName').attr('data-picture-ids');
+		if (pictures.length) {
+			pictures = pictures.split(' ');
+			$('.sonata-ba-collapsed-fields').prepend('<div id="pictures" style="margin-bottom: 15px;"></div>');
+			for (var i=0; i<pictures.length; i++) {
+				var parts = pictures[i].split(':');
+				var ProductID = parts[0];
+				var PictureID = parts[1];
+				var pictureImg = parts[2];
+				var yearEdition = parts[3];
+				$('#pictures').append($('<img>',{
+					'src': '/upload/products/' + pictureImg,
+					'style': "max-width: 300px; max-height: 200px; border: 1px solid #CCC",
+					'data-i': i
+				}));
+				var urlRemove = Routing.generate('remove_product_picture', {
+					'ProductID': ProductID,
+					'PictureID': PictureID
+				});
+				$('#pictures').append($('<a>',{
+					'class': 'remove-picture',
+					'data-i': i,
+					'href': urlRemove,
+					'style': "color:maroon; font-size:24px; font-weight:bold; margin-left:10px; margin-right:30px;",
+					'title': 'Удалить связь',
+					'text': yearEdition + ' X'
+				}));
+			}
+		}
+	});
+
+	$(document).on('click', '.remove-picture', function(e) {
+		e.preventDefault();
+		var $this = $(this);
+		$.getJSON(this.href, null, function(data) {
+			if (data == 'OK') {
+				var attr_data = $this.attr('data-i');
+				$("[data-i='" + attr_data + "']").remove();
+			}
+		});
+	});
+</script>

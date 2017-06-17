@@ -1,0 +1,154 @@
+{% extends 'VidalMainBundle::layout_blank.html.twig' %}
+
+
+{% block content %}
+	<div>
+		<input name="product" id="product" placeholder="начните вводить препарат..."/>
+		<select name="type" id="type">
+			<option value="0">Полные аналоги</option>
+			<option value="1">Близкие аналоги (ATX 5)</option>
+			<option value="2">Приблизительные аналоги (ATX 4)</option>
+			<option value="3">С близкими свойствами (ATX 3)</option>
+			<option value="4">Любой подходящий</option>
+		</select>
+		<input type="hidden" id="ProductID" name="ProductID"/>
+	</div>
+	<div>
+		<h3>Выбранный препарат</h3>
+		<div id="selected"></div>
+	</div>
+	<div>
+		<h3>Результаты поиска аналогов</h3>
+		<ul id="results"></ul>
+	</div>
+{% endblock %}
+
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		$(document).ready(function() {
+			var $ul = $('#results');
+			var $type = $('#type');
+			var ProductID = null;
+
+			$('#product').focus()
+				.autocomplete({
+					minLength: 2,
+					source:    function(request, response) {
+						var url = Routing.generate('api_drug_autocomplete_product', {
+							'term': $('#product').val(),
+							'type': $('#type').val()
+						});
+						$.getJSON(url, function(data) {
+							var values = [];
+							for (var i = 0; i < data.length; i++) {
+								values.push({
+									'id':   data[i].ProductID,
+									'text': data[i].RusName2 + ' : ' + data[i].ZipInfo + ' (' + data[i].GDDBName + ', ' + data[i].countryName + ')'
+								});
+							}
+
+							response(values);
+						});
+					},
+					select:    function(event, ui) {
+						var url = Routing.generate('api_drug_equal_ajax', {
+							'ProductID':  ui.item.id,
+							'EqRateType': $('#type').val()
+						});
+						$('#selected').text(ui.item.text);
+						$('#ProductID').val(ui.item.id);
+						ProductID = ui.item.id;
+						$ul.empty();
+						$.getJSON(url, function(data) {
+							if (data.length) {
+								for (var i = 0; i < data.length; i++) {
+									var product = data[i];
+									if (product.url && product.url.length) {
+										var url = Routing.generate('product_url', {'EngName': product.url});
+									}
+									else {
+										var url = Routing.generate('product', {
+											'EngName':   product.Name,
+											'ProductID': product.ProductID
+										});
+									}
+
+									$("<li></li>").html("<a class='no-underline' target='_blank' href='" + url + "'>"
+										+ product.RusName2 + ' : ' + product.ZipInfo
+										+ ' (' + product.GDDBName + ', ' + product.countryName + ')'
+										+ "</a>").appendTo($ul);
+								}
+							}
+							else {
+								$("<li></li>").html("Поиск не дал результатов").appendTo($ul);
+							}
+						});
+					}
+				})
+				.data("ui-autocomplete")._renderItem =
+				function(ul, item) {
+					return $("<li></li>").data("item.autocomplete", item).append("<a>" + item.text + "</a>").appendTo(ul);
+				};
+
+			$type.change(function() {
+				if (!ProductID) {
+					return;
+				}
+
+				var url = Routing.generate('api_drug_equal_ajax', {
+					'ProductID':  ProductID,
+					'EqRateType': $('#type').val()
+				});
+ 				$ul.empty();
+				$.getJSON(url, function(data) {
+					if (data.length) {
+						for (var i = 0; i < data.length; i++) {
+							var product = data[i];
+							if (product.url && product.url.length) {
+								var url = Routing.generate('product_url', {'EngName': product.url});
+							}
+							else {
+								var url = Routing.generate('product', {
+									'EngName':   product.Name,
+									'ProductID': product.ProductID
+								});
+							}
+
+							$("<li></li>").html("<a class='no-underline' target='_blank' href='" + url + "'>" + product.RusName2 + ' : ' + product.ZipInfo + "</a>").appendTo($ul);
+						}
+					}
+					else {
+						$("<li></li>").html("Поиск не дал результатов").appendTo($ul);
+					}
+				});
+			});
+		});
+	</script>
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style type="text/css">
+		.ui-menu .ui-menu-item {
+			border-bottom: 1px dotted gray !important;
+		}
+		#product, #type {
+			width:     223px;
+			font-size: 12px;
+		}
+		#product, #type {
+			width:                 420px;
+			height:                27px;
+			padding:               0 8px 2px;
+			border-radius:         4px;
+			-webkit-border-radius: 4px;
+			-moz-border-radius:    4px;
+			border:                1px solid #d71344;
+		}
+		#product {
+			height: 23px;
+		}
+	</style>
+{% endblock %}

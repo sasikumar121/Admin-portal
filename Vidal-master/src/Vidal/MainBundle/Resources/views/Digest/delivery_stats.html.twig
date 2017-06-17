@@ -1,0 +1,63 @@
+{% extends 'VidalMainBundle::layout_blank.html.twig' %}
+
+
+{% block content %}
+	{% include 'VidalMainBundle:Digest:menu.html.twig' %}
+
+	<div class="outer">
+		{% for msg in app.session.flashbag.get('msg') %}
+			<div class="msg">{{ msg }}</div>
+		{% endfor %}
+
+		<table class="stats">
+			<thead>
+			<tr>
+				<th>Идентификатор рассылки</th>
+				<th>Отправлено писем</th>
+				<th>Ошибок доставки</th>
+				<th>Открыто писем всего</th>
+				<th>Открыто писем уникальных</th>
+			</tr>
+			</thead>
+			<tbody>
+			{% for uniqueid, group in grouped if group.total %}
+				<tr>
+					<td>{{ uniqueid }}</td>
+					<td>{{ group.total }}</td>
+					<td>{{ group.failed }}</td>
+					<td>{{ group.opened }}</td>
+					<td>{{ group.opened_unique }}</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}
+
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		table.stats {
+			width:           100%;
+			border-collapse: collapse;
+			font-size:       14px;
+		}
+		table.stats td, table.stats th {
+			border:  1px solid #ccc;
+			padding: 3px 5px;
+		}
+		table.stats th {
+			font-size: 16px;
+			padding: 8px 5px;
+		}
+	</style>
+{% endblock %}
+
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/vidalmain/ckeditor/ckeditor.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('bundles/vidalmain/ckeditor/adapters/jquery.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('bundles/vidalmain/javascripts/ckeditor-config.js') }}"></script>
+{% endblock %}

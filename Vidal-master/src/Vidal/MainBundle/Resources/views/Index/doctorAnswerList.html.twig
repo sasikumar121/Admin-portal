@@ -1,0 +1,131 @@
+{% extends 'VidalMainBundle::layout.html.twig' %}
+
+
+{% block title %}
+    <h1>ОТВЕТЫ СПЕЦИАЛИСТОВ</h1>
+{% endblock %}
+
+
+{% block content %}
+        <table style="width: 100%">
+            <tr>
+                <th>
+                    Вопросы
+                    <select class="filter" id="filter">
+                        <option value="0">Все вопросы</option>
+                        {% for party in parties %}
+                            {% if thisPartyId == party.id %}
+                                <option value="{{ party.id }}" selected="selected">{{ party.title }}</option>
+                            {% else %}
+                                <option value="{{ party.id }}">{{ party.title }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </th>
+                <th>Ответить</th>
+            </tr>
+        {% if questions|length %}
+            {% for question in questions %}
+                <tr class="tr">
+                    <td style="width: 80%">
+                        {{ question.question|length > 120 ? question.question|slice(0, 120) ~ '...' : question.question  }}
+                    </td>
+                    <td style="text-align: center">
+                        <a href="{{ path('qa_admin_edit',{'faqId' : question.id }) }}"><img src="{{ asset('bundles/vidalmain/images/User-Information.png') }}" style="width: 20px; padding-right: 10px;"></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="2"><br />Не отвеченных вопросов не найдено<br /></td>
+            </tr>
+        {% endif %}
+        </table>
+
+
+{% endblock %}
+
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style type="text/css">
+        .qa {
+            position:      relative;
+            border:        3px solid #eee;
+            margin-bottom: 10px;
+            padding:       11px 12px 10px;
+        }
+        .qa-expand {
+            display:       inline-block;
+            border-bottom: 2px dotted #aaa;
+            color:         #d71344;
+            cursor:        pointer;
+        }
+        .qa-question p, .qa-answer p {
+            margin: 8px 0;
+        }
+        .qa-question p:first-child, .qa-answer p:first-child {
+            margin-top: 0;
+        }
+        .qa-question {
+            font-family: 'PT Sans Caption', sans-serif;
+            font-size:   15px;
+            color:       #2f4053;
+        }
+        .expanded .qa-question {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 8px;
+        }
+        .qa-answer {
+            font-size: 15px;
+            display:   none;
+        }
+
+
+        .qa-ask{
+            border-bottom: 3px solid #eee;
+            margin-bottom: 10px;
+        }
+        .tabs a{
+            width: 100%;
+            display: block;
+            text-align: center;
+            padding: 7px 0;
+        }
+        .green{
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #62AC75;
+            background: #a4ffbc;
+            color: #263e2e;
+            margin-bottom: 14px;
+        }
+        .tr td{
+            padding: 5px 0;
+            border-bottom: 1px solid #555555;
+        }
+        .filter{
+            background: #FFFFFF;
+            border: none;
+            outline: none;
+            border-bottom: 1px dashed #cccccc;
+            width: 180px;
+            text-align: right;
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function(){
+            $('#filter').change(function(){
+                var url = Routing.generate('qa_admin', {'party': $(this).val() });
+                window.location.href = url;
+            });
+        });
+
+    </script>
+{% endblock %}

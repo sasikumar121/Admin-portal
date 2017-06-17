@@ -1,0 +1,389 @@
+{% extends 'VidalMainBundle::layout.html.twig' %}
+
+{% block title %}
+    <h1>Запись к врачу</h1>
+{% endblock %}
+
+{% block content %}
+    {% if specialties is not empty %}
+        <div class="spec-box">
+            {% for spec in specialties %}
+                <div>
+                    <div class="spec-item" id="{{ spec.code }}">{{ spec.name }}</div>
+                    <div class="doc-box" id="spec-{{ spec.code }}"></div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        {#Записи к врачам отсутствуют. <a href="{{ path('appointment_create') }}">Записаться</a>#}
+    {% endif %}
+
+    <div class="bg-gray-ap"></div>
+    <div class="loader-ap"><img src="{{ asset('bundles/vidalmain/images/loader.gif') }}" style="width: 64px"></div>
+
+    <form method="POST" id="formdata" action="{{ path('appointment_create') }}">
+        <input type="hidden" name="availableResourceId"  id="availableResourceId"   value="">
+        <input type="hidden" name="complexResourceId"      id="complexResourceId"   value="">
+        <input type="hidden" name="receptionDate"              id="receptionDate"   value="">
+        <input type="hidden" name="startTime"                      id="startTime"   value="">
+        <input type="hidden" name="endTime"                          id="endTime"   value="">
+    </form>
+
+
+    <br />
+    <h1>Список записей</h1>
+    {% if apps is not empty and apps | length > 0 %}
+        <div class="app-box">
+            {% for app in apps %}
+                <div class="app-item" id="app{{ app.id }}">
+                    <a class="app-del" data-id="{{ app.id }}" href="{{ path('appointment_delete',{'appointmentId' : app.id}) }}">Удалить</a>
+                    <div class="app-date" style="font-weight: bold;"> {{ app.dateBegin | date('d.m.Y') }} с {{ app.dateBegin | date('H:i') }} до {{ app.dateEnd | date('H:i') }}</div>
+                    <br />
+                    <div class="app-doctor">
+                        <b>{{ app.appointmentReceptionToDoctor.doctorSpeciality }}</b> ( {{ app.appointmentReceptionToDoctor.room }} ) <br />
+                        {{ app.appointmentReceptionToDoctor.doctorFio }}
+                    </div>
+                    <br />
+                    <div class="app-lpu">
+                        <span style="font-weight: bold">{{ app.nameLpu }}</span>
+                        <span style="font-style: italic; font-size: 10px">({{ app.lpuAddress }})</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <span style="padding-left: 40px;">Записи к врачам отсутствуют.</span>
+    {% endif %}
+
+    <div class="confirmApp" id="confirmApp">
+        <table>
+            <tr>
+                <td colspan="2" class="title">Подтвердите запись к врачу</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="info" >
+                        <b>Врач:</b>  <span id="pfio"></span><br />
+                        <b>Место:</b> <span id="pplace"></span><br />
+                        <b>Специализация:</b> <span id="pspec"></span><br />
+                        <b>Дата и время:</b>  <span id="pdatetime"></span>
+                    </div>
+
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center;"><button class="btn-red" id="confirmAppBtn">Подтвердить</button></td>
+                <td style="text-align: center;"><button class="btn-red cancelAppBtn">Отмена</button></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="confirmApp" id="confirmRemove">
+        <table>
+            <tr>
+                <td colspan="2" class="title">Подтвердите отмену записи к врачу</td>
+            </tr>
+            <tr><td colspan="2">&nbsp;</td></tr>
+            <tr>
+                <td style="text-align: center;"><button class="btn-red" id="confirmRemoveBtn">Подтвердить</button></td>
+                <td style="text-align: center;"><button class="btn-red cancelAppBtn">Отмена</button></td>
+            </tr>
+        </table>
+    </div>
+
+
+{% endblock %}
+
+
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/vidalmain/javascripts/date.js') }}"></script>
+    <script>
+        $(document).ready(function(){
+
+            var doctorInfo = '';
+            var doctorDate = '';
+            var doctorTime = '';
+            var doctorFio  = '';
+            var doctorLpu  = '';
+            var doctorSpec = '';
+            var availableResourceId = '';
+            var complexResourceId   = '';
+            var receptionDate       = '';
+            var startTime           = '';
+            var endTime             = '';
+            var deleteUrl           = '';
+
+            $('.spec-item').click(function(){
+                var id = $(this).attr('id');
+                loadShow();
+                $.ajax({
+                    type: "POST",
+                    url: Routing.generate('appointment_doctor',{'doctorId' : id }),
+                    success: function(msg){
+                        loadHide();
+                        data = msg.data.availableResource;
+                        txt = '';
+                        $.each(data,function(i, val){
+                            if (val.lpuRoomsInfo && val.lpuRoomsInfo.lpuRoomView){
+                                txt += '<div>';
+                                txt +=  '<div class="doc-item" data-id="'+val.id+'" availableResourceId="'+val.lpuRoomsInfo.lpuRoomView.availableResourceId+'" ' +
+                                        'complexResourceId="'+val.lpuRoomsInfo.lpuRoomView.complexResourceId+'">';
+
+                                txt +=  '<span>' + val.lastName+' '+val.firstName+' '+val.secondName + '</span>';
+
+                                if (val.lpuRoomsInfo.lpuRoomView.lpuShortName){
+                                    txt += '<div style="font-size: 12px; font-style: italic;"> ( ';
+                                    txt +=  '  '+val.lpuRoomsInfo.lpuRoomView.lpuShortName;
+                                    txt +=  '  '+val.lpuRoomsInfo.lpuRoomView.roomNumber;
+                                    txt += ' ) </div>';
+                                }
+
+                                txt +=  '</div>' +
+                                        '<div class="dateTime-box" id="doc-'+val.id+'"></div>';
+                                txt += '</div>';
+                            }
+                        });
+                        $('#spec-'+id).html(txt);
+
+                    }
+                });
+            });
+
+
+            $('.doc-box').on('click','.doc-item', function(){
+                var availableResourceId = $(this).attr('availableResourceId');
+                var complexResourceId = $(this).attr('complexResourceId');
+                var $this = $(this);
+
+                loadShow();
+                $.ajax({
+                    type: "POST",
+                    url: Routing.generate('appointment_datetime',{'availableResourceId' : availableResourceId, 'complexResourceId': complexResourceId }),
+                    success: function(msg){
+                        loadHide();
+                        if ( msg.data.detail && msg.data.detail.exception ){
+                            alert(msg.data.detail.exception);
+                        }else{
+                            data = msg.data.return;
+                            var txt = '';
+                            if (data.schedules){
+                                $.each(data.schedules,function(i, val){
+                                    var d = new Date(val.date);
+                                    txt += '<div class="dateTime"><span class="date">'+ (d).toString('dd.MM.yyyy') + "</span><div style='margin-left: 25px;'>";
+                                    if (val.resourceSchedule){
+                                        if ( val.resourceSchedule.timePeriods){
+                                            $.each(val.resourceSchedule.timePeriods,function(timei, timeval){
+                                                if (timeval.allowedAppointment == true){
+                                                    enabled = 'enabledTime';
+                                                }else{
+                                                    enabled = ''
+                                                }
+                                                var dStart = new Date(timeval.startTime);
+                                                var dEnd = new Date(timeval.endTime);
+                                                txt += '<span class="time '+enabled+'" ' +
+                                                        'data-availableResourceId="'+availableResourceId+'" '+
+                                                        'data-complexResourceId="'+complexResourceId+'" '+
+                                                        'data-date="'+d+'" data-start="'+dStart+'" ' +
+                                                        'data-end="'+dEnd+'" '+
+                                                        'data-doctorFio="'+$this.children('span').text()+'" '+
+                                                        'data-doctorLpu="'+$this.children('div').html()+'"'+
+                                                        'data-doctorSpec="'+$this.parent().parent().parent().children('.spec-item').html()+'"'+
+                                                        '>'+
+                                                        dStart.toString('HH:mm') +'</span>';
+//                                                        alert(txt);
+                                            });
+                                        }
+                                    }else{
+                                        alert('Произошла ошибка выдачи результатов');
+                                    }
+                                    txt += '</div>';
+                                    txt += '</div>';
+                                });
+                                $('#doc-'+availableResourceId).html(txt);
+                            }else{
+                                alert('Произошла ошибка выдачи результатов');
+                            }
+                        }
+                    }
+                });
+            });
+
+            $('.doc-box').on('click','.time', function(){
+                availableResourceId = $(this).attr('data-availableResourceId');
+                complexResourceId   = $(this).attr('data-complexResourceId');
+                receptionDate       = $(this).attr('data-date');
+                startTime           = $(this).attr('data-start');
+                endTime             = $(this).attr('data-end');
+
+                doctorFio           = $(this).attr('data-doctorFio');
+                doctorLpu           = $(this).attr('data-doctorLpu');
+                doctorSpec          = $(this).attr('data-doctorSpec');
+
+                $('#pfio').html(doctorFio);
+                $('#pplace').html(doctorLpu);
+                $('#pspec').html(doctorSpec);
+                pdatetime = new Date(startTime);
+
+                $('#pdatetime').html(pdatetime.toString('dd.MM.yyyy HH:mm'));
+
+                $('#confirmApp').fadeIn();
+            });
+
+            $('.app-del').click(function(){
+                deleteUrl = $(this).attr('href');
+                console.log(deleteUrl);
+                $('#confirmRemove').fadeIn();
+                return false;
+            });
+
+            $('#confirmRemoveBtn').click(function(){
+                $('.confirmApp').fadeOut();
+                window.location.href = deleteUrl;
+            });
+
+            $('.cancelAppBtn').click(function(){
+                $('.confirmApp').fadeOut();
+                deleteUrl = '';
+            });
+
+            $('#confirmAppBtn').click(function(){
+                $('#availableResourceId').val(availableResourceId);
+                $('#complexResourceId').val(complexResourceId);
+                $('#receptionDate').val(receptionDate);
+                $('#startTime').val(startTime);
+                $('#endTime').val(endTime);
+                $('#formdata').submit();
+            });
+
+            function loadShow(){
+                $('.bg-gray-ap').fadeIn();
+                $('.loader-ap').fadeIn();
+            }
+            function loadHide(){
+                $('.bg-gray-ap').fadeOut();
+                $('.loader-ap').fadeOut();
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .spec-box{
+            width: 500px;
+        }
+        .spec-box .spec-item{
+            margin-top: -1px;
+            /*border: 1px solid #cc0000;*/
+            padding: 10px 10px;
+            border-bottom: 1px solid #CCCCCC;
+            border-top: 1px solid #CCCCCC;
+            text-transform: uppercase;
+
+        }
+        div.doc-item {
+            margin-top: -1px;
+            /*border: 1px solid #cc0000;*/
+            padding: 5px 10px;
+            padding-left: 40px;
+        }
+        .spec-item:hover, .doc-item:hover{
+            background: #eeeeee;
+            cursor: pointer;
+        }
+
+        .date{
+            font-weight: bold;
+            padding: 0 10px 0 10px;
+            display: inline-block;
+            width: 60px;
+            margin-top: 10px;
+        }
+        .time{
+            padding: 3px 10px;
+            background: #eeeeee;
+            border: 1px solid #eeeeee;
+            border-radius: 4px;
+            display: inline-block;
+            margin-left: 10px;
+            margin-top: 10px;
+        }
+        .time:hover{
+            border: 1px solid #CC0000;
+            cursor: pointer;
+        }
+        .dateTime{
+            /*height: 30px;*/
+            padding: 0 10px 0 40px;
+            /*padding-top: 10px;*/
+        }
+        .dateTime-box{
+            padding-top: 10px;
+        }
+        .bg-gray-ap{
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: #555555;
+            opacity: 0.5;
+            filter: alpha(Opacity=50);
+            z-index: 997;
+            display: none;
+        }
+        .loader-ap{
+            position: fixed;
+            width: 64px;
+            height: 64px;
+            left: 50%;
+            margin-left: -32px;
+            top: 300px;
+            z-index: 998;
+            display: none;
+        }
+        .app-item{
+            border-bottom: 1px solid #cccccc;
+            padding: 10px;
+            margin-top: -1px;
+        }
+        .app-del{
+            float: right;
+            margin-top: 30px;
+        }
+        .confirmApp{
+            width: 400px;
+            height: 190px;
+            border: 1px solid #d71344;
+            background: #FFFFFF;
+            position: fixed;
+            left: 50%;
+            margin-left: -200px;
+            top: 100px;
+            padding-top: 20px;
+            display: none;
+
+        }
+        .confirmApp table{
+            width: 100%;
+        }
+        .title{
+            text-align: center;
+            background: #FFFFFF;
+        }
+        .btn-red{
+            width: 135px;
+        }
+        .info{
+            line-height: 20px;
+            margin: 20px;
+        }
+        #confirmRemove{
+            height: 90px;
+        }
+    </style>
+{% endblock %}

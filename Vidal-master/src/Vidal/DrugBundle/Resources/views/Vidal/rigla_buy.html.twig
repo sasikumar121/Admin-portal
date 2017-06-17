@@ -1,0 +1,19 @@
+{% if riglaPrice is defined and riglaPrice is not empty %}
+	<noindex>
+		<div style="text-align: center; width: 100%; overflow: hidden; margin-bottom:20px;">
+			<a rel="nofollow" href="#" class="btn-buy btn-red"
+			   style="display: block; width: 50%; padding: 5px 10px 7px; margin-left:0; font-weight:bold;">
+				Где купить?
+			</a>
+		</div>
+	</noindex>
+	<script>
+		$(document).ready(function() {
+			$('.btn-buy').click(function() {
+				$("html, body").animate({scrollTop: $(document).height()}, 600);
+				ga('send', 'event', 'Pharmacy-click', 'Pharmacy-click');
+				return false;
+			});
+		});
+	</script>
+{% endif %}
