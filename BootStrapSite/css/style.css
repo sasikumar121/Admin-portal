@@ -1,0 +1,203 @@
+﻿* {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+/*style for the body of the website*/
+body {
+    max-width: 1600px;
+    margin: 0 auto;
+    font-family: Arial, verdana, serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: normal;
+    color: #039;
+    background: #00C;
+}
+/*style for the Headers the website*/
+h1, h2 {
+    font-weight: lighter;
+}
+/*Styles for Main header section*/
+header {
+    width: 90%;
+    float: left;
+    padding: 2% 5% 2%;
+    background:  #00C;
+}
+
+    header h1 {
+        font-size: 30px;
+        float: left;
+        color: #fefefe;
+        font-style: italic;
+        text-shadow: none;
+    }
+/*Styles for Main Section and Heading within Main section*/
+.main {
+    /*width: 80%;
+    padding: 0 10%;*/
+    float: left;
+}
+
+    .main h2 {
+        font-size: 22px;
+        text-align: left;
+        color: coral;
+        font-weight: bold;
+        margin: 1% 0 1%;
+    }
+
+    .main p {
+        text-align: left;
+        text-indent: 16px;
+        margin: 1% 0;
+    }
+
+        .main p.clear {
+            clear: both;
+        }
+
+/*Styles for AboutUs and Services section*/
+
+img.bodypics {
+    width: 95%;
+    height: auto;
+    max-height: 300px;
+}
+
+.section, .image-view, .desc-view, .contact-section, .estimate-view, .address-view {
+    float: left;
+    height: auto;
+}
+
+.section {
+    width: 100%;
+    margin: 0 0 1%;
+    max-height: 300px;
+    padding-bottom: 450px;
+}
+/*style for the form attributes website*/
+.formattributes {
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+.spacing {
+    width: 100%;
+    padding-bottom: 450px;
+}
+
+.image-view {
+    width: 30%;
+    max-height: 300px;
+}
+
+.desc-view {
+    width: 70%;
+    max-height: 300px;
+}
+/*Styles for Contact and Estimate section*/
+
+.contact-section {
+    width: 100%;
+}
+
+.estimate-view {
+    width: 60%;
+}
+
+.address-view {
+    width: 38%;
+}
+
+.bold-section {
+    font-weight: bold;
+    color: coral;
+}
+/*style for the contact website*/
+.contact-panel {
+    font-size: 22px;
+    text-align: left;
+    color: coral;
+    font-weight: bold;
+}
+
+.button {
+    background-color: coral;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+/*Styles for footer section*/
+#footer {
+    width: 100%;
+    background: #2e2e2e;
+    height: 45px;
+    float: left;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+#footer-text {
+    text-align: center;
+    color: #fefefe;
+    font-size: 14px;
+    padding: 10px;
+}
+
+.no-padding {
+    padding: 0px;
+}
+
+.no-margin {
+    margin: 0px;
+}
+
+.space-margin {
+    margin-top: 20px;
+}
+
+.site-footer {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #222;
+    color: #fff;
+    font-size: 14px;
+}
+
+.bottom-footer {
+    color: #b2b2b2;
+}
+
+.activefooter {
+    color: #fefefe;
+}
+
+.footer-nav {
+    text-align: right;
+    list-style: none;
+}
+
+    .footer-nav li {
+        display: inline;
+    }
+
+        .footer-nav li:not(:first-child):before {
+            content: '|';
+            padding: 0px 10px;
+        }
+
+    .footer-nav a {
+        color: #b2b2b2;
+    }
+
+        .footer-nav a:hover {
+            color:  #F00;
+            text-decoration: none;
+        }
